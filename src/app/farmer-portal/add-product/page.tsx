@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Upload } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // In a real app, this would be a Zod schema or similar for validation
 type ProductForm = {
@@ -25,11 +25,13 @@ export default function AddProductPage() {
     const router = useRouter();
     const { toast } = useToast();
     const { register, handleSubmit, setValue } = useForm<ProductForm>();
+    const [isEditing, setIsEditing] = useState(false);
 
     // Pre-fill form if editing
     useEffect(() => {
         const editingProduct = sessionStorage.getItem('editing_product');
         if (editingProduct) {
+            setIsEditing(true);
             const product = JSON.parse(editingProduct);
             setValue('productName', product.name);
             setValue('quantity', parseInt(product.quantity));
@@ -91,10 +93,10 @@ export default function AddProductPage() {
                     </Link>
                 </Button>
                 <h1 className="text-3xl font-bold tracking-tight font-headline">
-                    {sessionStorage.getItem('editing_product') ? 'Edit Product' : 'Add New Product'}
+                    {isEditing ? 'Edit Product' : 'Add New Product'}
                 </h1>
                 <p className="text-muted-foreground">
-                    {sessionStorage.getItem('editing_product') 
+                    {isEditing 
                         ? 'Update the details for your product.' 
                         : 'Fill out the form below to list a new item on the marketplace.'}
                 </p>
@@ -143,7 +145,7 @@ export default function AddProductPage() {
                         <div className="flex justify-end gap-2">
                             <Button variant="outline" type="button" onClick={() => router.push('/farmer-portal')}>Cancel</Button>
                             <Button type="submit">
-                                {sessionStorage.getItem('editing_product') ? 'Update Product' : 'Add Product'}
+                                {isEditing ? 'Update Product' : 'Add Product'}
                             </Button>
                         </div>
                     </form>
